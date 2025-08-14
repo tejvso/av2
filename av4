@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Luck Test</title>
+<style>
+  body { font-family: Arial; text-align: center; background: #222; color: white; }
+  h1 { color: gold; }
+  button { padding: 10px 20px; margin: 10px; font-size: 18px; cursor: pointer; border: none; border-radius: 5px; }
+  .roll { background: #28a745; color: white; }
+  .auto { background: #ff5722; color: white; }
+  .reset { background: #2196f3; color: white; }
+  .result { font-size: 20px; margin-top: 20px; }
+  select { padding: 5px; font-size: 16px; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h1>🎲 Luck Test</h1>
+
+<label>Select your target items (hold CTRL to select multiple):</label>
+<br>
+<select id="target" multiple size="5">
+  <option>Solar</option>
+  <option>Deadeye</option>
+  <option>Ethereal</option>
+  <option>Monarch</option>
+</select>
+<br>
+
+<button class="roll" onclick="rollOnce()">🎯 Roll Once</button>
+<button class="auto" onclick="autoRoll()">⚡ Auto Roll</button>
+<button class="reset" onclick="resetGame()">🔄 Reset</button>
+
+<div class="result" id="result"></div>
+<div id="count">Rolls: 0</div>
+
+<script>
+const traits = [
+  { name: "Solar", chance: 0.5 },
+  { name: "Deadeye", chance: 0.375 },
+  { name: "Ethereal", chance: 0.175 },
+  { name: "Monarch", chance: 0.1 },
+  { name: "Common Item", chance: 98.85 }
+];
+
+let rolls = 0;
+let autoInterval;
+
+function rollOnce() {
+  rolls++;
+  document.getElementById("count").innerText = "Rolls: " + rolls;
+
+  let rand = Math.random() * 100;
+  let sum = 0;
+  let got = "Common Item";
+
+  for (let t of traits) {
+    sum += t.chance;
+    if (rand <= sum) {
+      got = t.name;
+      break;
+    }
+  }
+
+  document.getElementById("result").innerText = "📦 You got: " + got;
+  return got;
+}
+
+function autoRoll() {
+  clearInterval(autoInterval);
+  let targetItems = Array.from(document.getElementById("target").selectedOptions).map(o => o.value);
+
+  if (targetItems.length === 0) {
+    alert("⚠ Please select at least one target item.");
+    return;
+  }
+
+  autoInterval = setInterval(() => {
+    let got = rollOnce();
+    if (targetItems.includes(got)) {
+      clearInterval(autoInterval);
+      alert("✅ You got " + got + " after " + rolls + " rolls!");
+    }
+  }, 30);
+}
+
+function resetGame() {
+  clearInterval(autoInterval);
+  rolls = 0;
+  document.getElementById("count").innerText = "Rolls: 0";
+  document.getElementById("result").innerText = "";
+}
+</script>
+
+</body>
+</html>
+
